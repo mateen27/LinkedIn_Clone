@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   verificationToken: String,
   profileImage: {
     type: String,
-    default: null,
+    default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
   },
   userDescription: {
     type: String,
