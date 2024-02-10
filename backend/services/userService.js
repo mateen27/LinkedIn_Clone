@@ -76,4 +76,27 @@ const verifyUser = async (token) => {
   }
 };
 
-module.exports = { findUserByEmail, createUser, verifyUser };
+// for logging the user
+const loginUser = async (email, password) => {
+  try {
+    // check if the user exists
+    const user = await User.findOne({ email });
+
+    // user does not exist
+    if (!user) {
+      throw new Error("Invalid email or password");
+    }
+
+    // checking the password
+    if (user.password !== password) {
+      throw new Error("Invalid email or password");
+    }
+
+    return user;
+  } catch (error) {
+    console.log("Error logging the user", error);
+    throw error;
+  }
+};
+
+module.exports = { findUserByEmail, createUser, verifyUser, loginUser };
