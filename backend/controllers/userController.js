@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const userService = require("../services/userService");
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 // for registration purposes only
 const registerUser = async (req, res) => {
@@ -53,4 +55,31 @@ const verifyUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verifyUser };
+// for login purposes
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // checking if the user's password is correct
+    const user = await userService.loginUser(email, password);
+
+    // If user authentication is successful, generate JWT token
+    const token = jwt.sign({ userId: user._id }, secretKey);
+
+    res.status(200).json({ user, token });
+  } catch (error) {
+    console.log("Error logging the user", error);
+    res.status(500).json({ message: "Failed to login the user!" });
+  }
+};
+
+// function for generating the secret key
+const generateSecretKey = () => {
+  const secretKey = crypto.randomBytes(32).toString("hex");
+
+  return secretKey;
+};
+
+const secretKey = generateSecretKey();
+
+module.exports = { registerUser, verifyUser, loginUser };
