@@ -9,12 +9,14 @@ import {
   TouchableOpacity,
   Pressable,
   Button,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 // icons imports
 import { MaterialIcons } from "@expo/vector-icons";
 // expo router
 import { useRouter } from "expo-router";
+import axios from "axios";
 
 const register = () => {
   // state management
@@ -25,6 +27,37 @@ const register = () => {
 
   //   router
   const router = useRouter();
+
+  //   function for registering the user
+  const handleRegister = async () => {
+    const user = {
+      name,
+      email,
+      password,
+      profileImage: image,
+    };
+
+    axios
+      .post(`http://192.168.29.181:8080/user/register`, user)
+      .then((response) => {
+        console.log(response);
+        Alert.alert(
+          "Registeration successful!",
+          "You have been registered successfully"
+        );
+        setName("");
+        setEmail("");
+        setPassword("");
+        setImage("");
+      })
+      .catch((error) => {
+        Alert.alert(
+          "Registeration failed",
+          "An error occurred while registering the user!"
+        );
+        console.log("registeration failed", error);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -71,7 +104,7 @@ const register = () => {
             <TextInput
               style={[styles.emailInputStyle, { fontSize: email ? 16 : 14 }]}
               placeholder="Enter your Email"
-              value={name}
+              value={email}
               onChangeText={(email) => setEmail(email)}
             />
           </View>
@@ -110,7 +143,10 @@ const register = () => {
           {/* for the spacing between the text and the button */}
           <View style={{ marginTop: 50 }} />
 
-          <TouchableOpacity style={styles.loginButtonContainer}>
+          <TouchableOpacity
+            onPress={() => handleRegister()}
+            style={styles.loginButtonContainer}
+          >
             <Text style={styles.loginButtonTextStyle}>Register</Text>
           </TouchableOpacity>
 
