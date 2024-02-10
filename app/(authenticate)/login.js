@@ -8,12 +8,16 @@ import {
   TextInput,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 // icons imports
 import { MaterialIcons } from "@expo/vector-icons";
 // expo router
 import { useRouter } from "expo-router";
+// imports
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const login = () => {
   // state management
@@ -22,6 +26,31 @@ const login = () => {
 
   //   router
   const router = useRouter();
+
+  //   function for logging the user in the application
+  const handleLogin = async () => {
+    const user = {
+      email,
+      password,
+    };
+
+    axios
+      .post("http://192.168.29.181:8080/user/login", user)
+      .then((response) => {
+        console.log(response.data);
+        setEmail("");
+        setPassword("");
+        if (response.data.status === 200) {
+          const token = response.data.token;
+          AsyncStorage.setItem("authToken", token);
+          router.replace("/(tabs)/home");
+        }
+      })
+      .catch((error) => {
+        Alert.alert("Error:", "Error logging in the application");
+        console.log("Error logging into the application", error);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -84,7 +113,10 @@ const login = () => {
           {/* for the spacing between the text and the button */}
           <View style={{ marginTop: 80 }} />
 
-          <TouchableOpacity style={styles.loginButtonContainer}>
+          <TouchableOpacity
+            onPress={() => handleLogin()}
+            style={styles.loginButtonContainer}
+          >
             <Text style={styles.loginButtonTextStyle}>Login</Text>
           </TouchableOpacity>
 
