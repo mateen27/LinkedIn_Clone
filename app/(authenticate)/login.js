@@ -18,6 +18,8 @@ import { useRouter } from "expo-router";
 // imports
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import JWT from "expo-jwt";
+import secretKey from "../../private/secretKey";
 
 const login = () => {
   // state management
@@ -69,8 +71,19 @@ const login = () => {
         const token = response.data.token;
         console.log("token : ", token);
 
+        // accessing the userID
+        const userID = response.data.user._id;
+        // console.log("userID : ", userID);
+
+        // encoding the userID
+        const encodeUserID = JWT.encode({ userID } , secretKey);
+        // console.log("encodeUserID : ", encodeUserID);
+
         // storing the token in async Storage!
         AsyncStorage.setItem("authToken", token);
+
+        // storing the userID in async Storage
+        AsyncStorage.setItem("userID", encodeUserID);
 
         // navigating to the Home Screen!
         router.replace("/(tabs)/home");
