@@ -84,7 +84,7 @@ const loginUser = async (email, password) => {
 
     // user does not exist
     if (!user) {
-      throw new Error("Invalid email or password");
+      throw new Error("Invalid email of the user");
     }
 
     // checking the password
