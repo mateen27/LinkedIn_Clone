@@ -10,7 +10,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // icons imports
 import { MaterialIcons } from "@expo/vector-icons";
 // expo router
@@ -27,29 +27,62 @@ const login = () => {
   //   router
   const router = useRouter();
 
-  //   function for logging the user in the application
-  const handleLogin = async () => {
-    const user = {
-      email,
-      password,
+  //   checking the login status
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        // accessing the token from async storage!
+        const token = await AsyncStorage.getItem("authToken");
+
+        // if token found
+        if (token) {
+          router.replace("/(tabs)/home");
+        } else {
+          // token not found navigate to the Login Screen itself!
+        }
+      } catch (error) {
+        console.log("error checking the login status", error);
+      }
     };
 
-    axios
-      .post("http://192.168.29.181:8080/user/login", user)
-      .then((response) => {
-        console.log(response.data);
-        setEmail("");
-        setPassword("");
-        if (response.data.status === 200) {
-          const token = response.data.token;
-          AsyncStorage.setItem("authToken", token);
-          router.replace("/(tabs)/home");
-        }
-      })
-      .catch((error) => {
-        Alert.alert("Error:", "Error logging in the application");
-        console.log("Error logging into the application", error);
-      });
+    // calling the function
+    checkLoginStatus();
+  }, []);
+
+  //   function for logging the user in the application
+  const handleLogin = async () => {
+    try {
+      const user = {
+        email,
+        password,
+      };
+
+      const response = await axios.post(
+        "http://192.168.29.181:8080/user/login",
+        user
+      );
+
+      console.log(response);
+
+      if (response.status === 201 || response.status === 200) {
+        // accessing the token
+        const token = response.data.token;
+        console.log("token : ", token);
+
+        // storing the token in async Storage!
+        AsyncStorage.setItem("authToken", token);
+
+        // navigating to the Home Screen!
+        router.replace("/(tabs)/home");
+      } else {
+        Alert.alert("Login Error", "Invalid email or password!");
+        console.log(response.status);
+      }
+    } catch (error) {
+      // Handle errors from the request or AsyncStorage
+      console.error("Login error:", error);
+      Alert.alert("Login Error", "An error occurred during login.");
+    }
   };
 
   return (
