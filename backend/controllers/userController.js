@@ -82,4 +82,62 @@ const generateSecretKey = () => {
 
 const secretKey = generateSecretKey();
 
-module.exports = { registerUser, verifyUser, loginUser };
+// for fetching the user Profile data purposes only
+const userProfile = async (req, res) => {
+  try {
+    // accessing the userId through the req parameter
+    const userId = req.params.userId;
+
+    // checking the user if present
+    const user = await userService.findUserById(userId);
+
+    // user is not found
+    if (!user) {
+      res.status(404).json({ message: "User not found!" });
+    }
+
+    // user is found
+    res.status(200).json({ user });
+  } catch (error) {
+    console.log("error retrieving user profile", error);
+    res.status(500).json({ message: "Failed to retrieve user profile!" });
+  }
+};
+
+// for displaying the registered user profile except the logged-in user profile
+const displayRegisteredUsers = async (req, res) => {
+  try {
+    const loggedInUserId = req.params.userId;
+
+    // fetch the logged-in user profile connection
+    const loggedInUser = await userService.getUserConnections(loggedInUserId);
+
+    if (!loggedInUser) {
+      res.status(404).json({ message: "User not found!" });
+    }
+
+    // get the ID's of the connected users
+    const connectedUsersId = loggedInUser.connections.map(
+      (connection) => connection._id
+    );
+
+    // find the users that are connected to this user
+    const users = await userService.findUsersNotConnected(
+      loggedInUserId,
+      connectedUsersId
+    );
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.log("error displaying user profile", error);
+    res.status(500).json({ message: "Failed to display user profiles!" });
+  }
+};
+
+module.exports = {
+  registerUser,
+  verifyUser,
+  loginUser,
+  userProfile,
+  displayRegisteredUsers,
+};

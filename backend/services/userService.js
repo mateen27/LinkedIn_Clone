@@ -99,4 +99,56 @@ const loginUser = async (email, password) => {
   }
 };
 
-module.exports = { findUserByEmail, createUser, verifyUser, loginUser };
+// for finding the user by the userId
+const findUserById = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+
+    return user;
+  } catch (error) {
+    console.log("error finding the user by the userId", error);
+    throw error;
+  }
+};
+
+// for fetching the logged-in user connections data from the database
+const getUserConnections = async (userId) => {
+  try {
+    const userConnections = await User.findById(userId).populate(
+      "connections",
+      "_id"
+    );
+
+    return userConnections;
+  } catch (error) {
+    console.log("error finding the connections of the user", error);
+    throw error;
+  }
+};
+
+// for the users which are not connected to the logged in users account
+const findUsersNotConnected = async (loggedInUserId, connectedUsersId) => {
+  try {
+    const users = await User.find({
+      _id: { $ne: loggedInUserId, $nin: connectedUsersId },
+    });
+
+    return users;
+  } catch (error) {
+    console.log(
+      "error finding the users which are not connected to the logged in users account",
+      error
+    );
+    throw error;
+  }
+};
+
+module.exports = {
+  findUserByEmail,
+  createUser,
+  verifyUser,
+  loginUser,
+  findUserById,
+  getUserConnections,
+  findUsersNotConnected,
+};
