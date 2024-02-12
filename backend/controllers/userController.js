@@ -134,10 +134,27 @@ const displayRegisteredUsers = async (req, res) => {
   }
 };
 
+// for sending connection requests to the people
+const sendRequest = async (req, res) => {
+  try {
+    const { currentUserId, selectedUserId } = req.body;
+
+    const selectedUser = await userService.sendConnectionRequest(currentUserId , selectedUserId);
+
+    if ( selectedUser ) {
+      res.status(200).json({ message: "Connection request sent successfully" });
+    }
+  } catch (error) {
+    console.log("error sending connection request!", error);
+    res.status(500).json({ message: "Failed to send connection request!" });
+  }
+};
+
 module.exports = {
   registerUser,
   verifyUser,
   loginUser,
   userProfile,
   displayRegisteredUsers,
+  sendRequest,
 };
