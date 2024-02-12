@@ -16,5 +16,7 @@ router.get("/users/:userId", userController.displayRegisteredUsers);
 router.post("/connection-request", userController.sendRequest);
 // for showing all the connection request of the logged in user
 router.get("/connection-request/:userId", userController.displayRequests);
+// for accepting the connection request of the logged in user
+router.post("/accept-request", userController.acceptRequest);
 
 module.exports = router;

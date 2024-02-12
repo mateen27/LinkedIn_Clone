@@ -139,9 +139,12 @@ const sendRequest = async (req, res) => {
   try {
     const { currentUserId, selectedUserId } = req.body;
 
-    const selectedUser = await userService.sendConnectionRequest(currentUserId , selectedUserId);
+    const selectedUser = await userService.sendConnectionRequest(
+      currentUserId,
+      selectedUserId
+    );
 
-    if ( selectedUser ) {
+    if (selectedUser) {
       res.status(200).json({ message: "Connection request sent successfully" });
     }
   } catch (error) {
@@ -151,9 +154,9 @@ const sendRequest = async (req, res) => {
 };
 
 //  for displaying the connection requests of the particular user
-const displayRequests = async ( req , res ) => {
+const displayRequests = async (req, res) => {
   try {
-    const currentUserId  = req.params.userId;
+    const currentUserId = req.params.userId;
 
     // console.log(currentUserId);
     const users = await userService.getUserConnectionRequest(currentUserId);
@@ -161,10 +164,49 @@ const displayRequests = async ( req , res ) => {
     res.json(users);
     // console.log(users);
   } catch (error) {
-    console.log("error retrieving the connection request of the logged-in user!", error);
-    res.status(500).json({ message: "Failed to retrieve the connection request of the logged-in user!" });
+    console.log(
+      "error retrieving the connection request of the logged-in user!",
+      error
+    );
+    res.status(500).json({
+      message:
+        "Failed to retrieve the connection request of the logged-in user!",
+    });
   }
-}
+};
+
+const acceptRequest = async (req, res) => {
+  try {
+    const { senderId, recepientId } = req.body;
+
+    const sender = await userService.findUserById(senderId);
+    const receiver = await userService.findUserById(recepientId);
+
+    sender.connections.push(recepientId);
+    receiver.connections.push(senderId);
+
+    // modify the sentConnectionRequest and connection Request of the both sender and receiver
+    receiver.connectionRequest = receiver.connectionRequest.filter(
+      (request) => request.toString() !== senderId.toString()
+    );
+
+    sender.sentConnectionRequests = sender.sentConnectionRequests.filter(
+      (request) => request.toString()!== recepientId.toString()
+    );
+
+    // saving the data to the backend
+    await sender.save();
+    await receiver.save();
+
+    // sending the response back
+    res.status(200).json({ message: "Connection request accepted successfully" });
+  } catch (error) {
+    console.log("error accepting the connection request of the logged-in user");
+    res.status(500).json({
+      message: "Failed to accept the connection request of the logged-in user!",
+    });
+  }
+};
 
 module.exports = {
   registerUser,
@@ -173,5 +215,6 @@ module.exports = {
   userProfile,
   displayRegisteredUsers,
   sendRequest,
-  displayRequests
+  displayRequests,
+  acceptRequest
 };
