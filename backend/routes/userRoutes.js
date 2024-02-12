@@ -15,5 +15,6 @@ router.get("/users/:userId", userController.displayRegisteredUsers);
 // for sending the connection request to the people
 router.post("/connection-request", userController.sendRequest);
 // for showing all the connection request of the logged in user
+router.get("/connection-request/:userId", userController.displayRequests);
 
 module.exports = router;
