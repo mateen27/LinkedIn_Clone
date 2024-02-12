@@ -150,6 +150,22 @@ const sendRequest = async (req, res) => {
   }
 };
 
+//  for displaying the connection requests of the particular user
+const displayRequests = async ( req , res ) => {
+  try {
+    const currentUserId  = req.params.userId;
+
+    // console.log(currentUserId);
+    const users = await userService.getUserConnectionRequest(currentUserId);
+
+    res.json(users);
+    // console.log(users);
+  } catch (error) {
+    console.log("error retrieving the connection request of the logged-in user!", error);
+    res.status(500).json({ message: "Failed to retrieve the connection request of the logged-in user!" });
+  }
+}
+
 module.exports = {
   registerUser,
   verifyUser,
@@ -157,4 +173,5 @@ module.exports = {
   userProfile,
   displayRegisteredUsers,
   sendRequest,
+  displayRequests
 };

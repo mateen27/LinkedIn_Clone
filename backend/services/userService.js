@@ -162,6 +162,24 @@ const sendConnectionRequest = async (currentUserId, selectedUserId) => {
   }
 };
 
+const getUserConnectionRequest = async (currentUserId) => {
+  try {
+    const user = await User.findById(currentUserId)
+      .populate("connectionRequest", "name email profileImage")
+      .lean();
+
+    const connectionRequest = user.connectionRequest;
+    // console.log(currentUserId);
+
+    return connectionRequest;
+  } catch (error) {
+    console.log(
+      "error retrieving connection request of the currently logged in user",
+      error
+    );
+  }
+};
+
 module.exports = {
   findUserByEmail,
   createUser,
@@ -170,5 +188,6 @@ module.exports = {
   findUserById,
   getUserConnections,
   findUsersNotConnected,
-  sendConnectionRequest
+  sendConnectionRequest,
+  getUserConnectionRequest
 };
