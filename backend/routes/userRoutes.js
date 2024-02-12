@@ -9,8 +9,11 @@ router.get("/verify/:token", userController.verifyUser);
 // endpoint for logging in the user into the application
 router.post("/login", userController.loginUser);
 // endpoint for user's profile
-router.get('/profile/:userId', userController.userProfile);
+router.get("/profile/:userId", userController.userProfile);
 // for showing all the registered users except the logged in user profile
 router.get("/users/:userId", userController.displayRegisteredUsers);
+// for sending the connection request to the people
+router.post("/connection-request", userController.sendRequest);
+// for showing all the connection request of the logged in user
 
 module.exports = router;

@@ -143,6 +143,25 @@ const findUsersNotConnected = async (loggedInUserId, connectedUsersId) => {
   }
 };
 
+//  for sending connections requests purposes only
+const sendConnectionRequest = async (currentUserId, selectedUserId) => {
+  try {
+    const updateReceiver = await User.findByIdAndUpdate(selectedUserId, {
+      // update the sent request section of the user in the database
+      $push: { connectionRequest: currentUserId },
+    });
+
+    const updateUser = await User.findByIdAndUpdate(currentUserId, {
+      $push: { sentConnectionRequests: selectedUserId },
+    });
+
+    // Return the updated user objects
+    return { updateReceiver, updateUser };
+  } catch (error) {
+    console.log("error sending connection request");
+  }
+};
+
 module.exports = {
   findUserByEmail,
   createUser,
@@ -151,4 +170,5 @@ module.exports = {
   findUserById,
   getUserConnections,
   findUsersNotConnected,
+  sendConnectionRequest
 };
