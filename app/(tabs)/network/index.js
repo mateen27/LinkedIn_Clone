@@ -144,7 +144,7 @@ const index = () => {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={2}
         keyExtractor={(item) => item._id}
-        renderItem={({ item, key }) => <UserProfile item={item} key={index} />}
+        renderItem={({ item, key }) => <UserProfile userId={userId} item={item} key={index} />}
       />
     </ScrollView>
   );

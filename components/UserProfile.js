@@ -6,9 +6,37 @@ import {
   Dimensions,
   Pressable,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 
-const UserProfile = ({ item }) => {
+const UserProfile = ({ item, userId }) => {
+  // console.log("user id", userId);
+  // console.log(item._id)
+
+  // state management
+  const [connectionSent, setConnectionSent] = useState(false);
+
+  // send request to the person
+  const sendConnectionRequest = async (currentUserId, selectedUserId) => {
+    try {
+      const response = await fetch(
+        `http://192.168.29.181:8080/user/connection-request`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ currentUserId, selectedUserId }),
+        }
+      );
+
+      if (response.ok) {
+        setConnectionSent(true);
+      }
+    } catch (error) {
+      console.log("error sending connection request to the person", error);
+    }
+  };
+
   // Array of LinkedIn bios
   const linkedinBios = [
     "Passionate about leveraging technology to solve real-world problems.",
@@ -70,8 +98,33 @@ const UserProfile = ({ item }) => {
       </View>
 
       {/* Button for sending the connection Request */}
-      <Pressable style={styles.connectButtonContainer}>
-        <Text style = { styles.connectTextStyle }>Connect</Text>
+      <Pressable
+        onPress={() => sendConnectionRequest(userId, item._id)}
+        style={[
+          styles.connectButtonContainer,
+          {
+            borderColor:
+              connectionSent || item?.connectionRequest?.includes(userId)
+                ? "grey"
+                : "#0072b1",
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.connectTextStyle,
+            {
+              color:
+                connectionSent || item?.connectionRequest?.includes(userId)
+                  ? "grey"
+                  : "#0072b1",
+            },
+          ]}
+        >
+          {connectionSent || item?.connectionRequest?.includes(userId)
+            ? "Pending"
+            : "Connect"}
+        </Text>
       </Pressable>
     </View>
   );
@@ -121,16 +174,14 @@ const styles = StyleSheet.create({
   connectButtonContainer: {
     marginLeft: "auto",
     marginRight: "auto",
-    borderColor: "#0072b1",
     borderWidth: 1,
     borderRadius: 25,
     marginTop: 7,
-    paddingHorizontal : 15,
-    paddingVertical : 4
+    paddingHorizontal: 15,
+    paddingVertical: 4,
   },
-  connectTextStyle : {
-    color : "#0072b1",
-    fontWeight : "600",
-    textAlign : "center"
-  }
+  connectTextStyle: {
+    fontWeight: "600",
+    textAlign: "center",
+  },
 });
