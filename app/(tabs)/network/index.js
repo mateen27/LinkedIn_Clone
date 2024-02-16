@@ -15,12 +15,14 @@ import axios from "axios";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import UserProfile from "../../../components/UserProfile";
+import ConnectionRequest from "../../../components/ConnectionRequest";
 
 const index = () => {
   // state management
   const [userId, setUserId] = useState("");
   const [userData, setUserData] = useState();
   const [users, setUsers] = useState();
+  const [connectionRequest, setConnectionRequest] = useState([]);
 
   // for fetching the user-details
   useEffect(() => {
@@ -32,6 +34,7 @@ const index = () => {
     if (userId) {
       fetchUserProfile();
       fetchUsers();
+      fetchFriendRequests();
     }
   }, [userId]);
 
@@ -92,7 +95,33 @@ const index = () => {
     }
   };
 
-  console.log("users", users);
+  // console.log("users", users);
+
+  // method to fetch the friends requests of the user
+  const fetchFriendRequests = async () => {
+    try {
+      const request = await axios.get(
+        `http://192.168.29.181:8080/user/connection-request/${userId}`
+      );
+      if (request.status === 200 || request.status === 201) {
+        const connectionRequests = request.data?.map((friendRequest) => ({
+          _id: friendRequest._id,
+          name: friendRequest.name,
+          email: friendRequest.email,
+          image: friendRequest.profileImage,
+        }));
+
+        setConnectionRequest(connectionRequests);
+      }
+    } catch (error) {
+      console.log("error fetching friends requests", error);
+    }
+  };
+
+  console.log("connection request", connectionRequest);
+  // const length = connectionRequest.length;
+  // console.log('connection request length' , length);
+
 
   return (
     <ScrollView style={styles.container}>
@@ -109,7 +138,7 @@ const index = () => {
 
       {/* for the invitation text and arrow button */}
       <View style={styles.invitationContainer}>
-        <Text style={styles.invitationTextStyle}>Invitations (0)</Text>
+        <Text style={styles.invitationTextStyle}>Invitations {connectionRequest.length}</Text>
         <AntDesign name="arrowright" size={22} color="black" />
       </View>
 
@@ -119,7 +148,21 @@ const index = () => {
       />
 
       {/* for showing all the connection requests */}
-      <View></View>
+      <View>
+        {connectionRequest?.map((item, index) => (
+          <ConnectionRequest
+            item={item}
+            key={index}
+            connectionRequest={connectionRequest}
+            setConnectionRequest={setConnectionRequest}
+            userId={userId}
+          />
+        ))}
+      </View>
+
+      <View
+        style={{ borderColor: "#e0e0e0", borderWidth: 2, marginVertical: 10 }}
+      />
 
       {/* for showing the people who are not connected */}
       <View style={styles.growNetworkContainer}>
@@ -144,7 +187,9 @@ const index = () => {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         numColumns={2}
         keyExtractor={(item) => item._id}
-        renderItem={({ item, key }) => <UserProfile userId={userId} item={item} key={index} />}
+        renderItem={({ item, key }) => (
+          <UserProfile userId={userId} item={item} key={index} />
+        )}
       />
     </ScrollView>
   );
