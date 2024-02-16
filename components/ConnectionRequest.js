@@ -10,7 +10,35 @@ const ConnectionRequest = ({
   setConnectionRequest,
   userId,
 }) => {
-//   console.log(item);
+  //   console.log(item);
+
+  //   function to accept the connection requests
+  const acceptConnection = async (requestId) => {
+    try {
+      const connection = await fetch(
+        `http://192.168.29.181:8080/user/accept-request`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            senderId: requestId,
+            recepientId: userId,
+          }),
+        }
+      );
+
+      if (connection.ok) {
+        setConnectionRequest(
+          connectionRequest.filter((request) => request._id !== requestId)
+        );
+      }
+    } catch (error) {
+      console.log("error accepting connection request", error);
+    }
+  };
+
   return (
     <View style={styles.requestContainer}>
       {/* for holding the image  , name */}
@@ -23,12 +51,14 @@ const ConnectionRequest = ({
 
         <View style={styles.iconContainer}>
           {/* icon for cross or rejecting friend request*/}
-          <Pressable style={styles.iconStyle}>
+          <Pressable
+            style={styles.iconStyle}
+          >
             <Feather name="x" size={22} color="black" />
           </Pressable>
 
           {/* icon for accepting friend Requests */}
-          <Pressable style={styles.iconStyle}>
+          <Pressable onPress={() => acceptConnection(item._id)} style={styles.iconStyle}>
             <Ionicons name="checkmark-outline" size={22} color="#0072b1" />
           </Pressable>
         </View>
@@ -48,7 +78,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    resizeMode: "contain",
+    resizeMode: "cover",
   },
   textStyle: {
     width: 200,
@@ -65,8 +95,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    position : 'absolute' ,
+    position: "absolute",
     right: 10,
-    top: 10,
+    // top: 10,
   },
 });

@@ -122,7 +122,6 @@ const index = () => {
   // const length = connectionRequest.length;
   // console.log('connection request length' , length);
 
-
   return (
     <ScrollView style={styles.container}>
       {/* for the heading text */}
@@ -138,7 +137,9 @@ const index = () => {
 
       {/* for the invitation text and arrow button */}
       <View style={styles.invitationContainer}>
-        <Text style={styles.invitationTextStyle}>Invitations {connectionRequest.length}</Text>
+        <Text style={styles.invitationTextStyle}>
+          Invitations {connectionRequest.length}
+        </Text>
         <AntDesign name="arrowright" size={22} color="black" />
       </View>
 
@@ -160,9 +161,11 @@ const index = () => {
         ))}
       </View>
 
-      <View
-        style={{ borderColor: "#e0e0e0", borderWidth: 2, marginVertical: 10 }}
-      />
+      {connectionRequest.length > 0 && (
+        <View
+          style={{ borderColor: "#e0e0e0", borderWidth: 2, marginVertical: 10 }}
+        />
+      )}
 
       {/* for showing the people who are not connected */}
       <View style={styles.growNetworkContainer}>
