@@ -16,6 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import UserProfile from "../../../components/UserProfile";
 import ConnectionRequest from "../../../components/ConnectionRequest";
+import { router } from "expo-router";
 
 const index = () => {
   // state management
@@ -95,7 +96,7 @@ const index = () => {
     }
   };
 
-  // console.log("users", users);
+  console.log("users", users);
 
   // method to fetch the friends requests of the user
   const fetchFriendRequests = async () => {
@@ -125,7 +126,10 @@ const index = () => {
   return (
     <ScrollView style={styles.container}>
       {/* for the heading text */}
-      <Pressable style={styles.manageNetworkStyle}>
+      <Pressable
+        onPress={() => router.push("/network/connections")}
+        style={styles.manageNetworkStyle}
+      >
         <Text style={styles.manageTextStyle}>Manage My Network</Text>
         <AntDesign name="arrowright" size={22} color="black" />
       </Pressable>

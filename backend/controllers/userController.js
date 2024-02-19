@@ -175,6 +175,7 @@ const displayRequests = async (req, res) => {
   }
 };
 
+// for accepting the connection requests from a user
 const acceptRequest = async (req, res) => {
   try {
     const { senderId, recepientId } = req.body;
@@ -191,7 +192,7 @@ const acceptRequest = async (req, res) => {
     );
 
     sender.sentConnectionRequests = sender.sentConnectionRequests.filter(
-      (request) => request.toString()!== recepientId.toString()
+      (request) => request.toString() !== recepientId.toString()
     );
 
     // saving the data to the backend
@@ -199,11 +200,40 @@ const acceptRequest = async (req, res) => {
     await receiver.save();
 
     // sending the response back
-    res.status(200).json({ message: "Connection request accepted successfully" });
+    res
+      .status(200)
+      .json({ message: "Connection request accepted successfully" });
   } catch (error) {
     console.log("error accepting the connection request of the logged-in user");
     res.status(500).json({
       message: "Failed to accept the connection request of the logged-in user!",
+    });
+  }
+};
+
+// for displaying all the connected users
+const displayConnections = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await userService
+      .findUserById(userId)
+      // .populate("connections", "name email profileImage createdAt")
+      // .exec();
+
+    if (!user) {
+      res.status(404).json({ message: "User not found!" });
+    }
+
+    if ( user ) {
+      const userInfo = await user.populate("connections" , "name email profileImage createdAt")
+      res.status(200).json( userInfo.connections );
+      // console.log(userInfo.connections);
+    }
+  } catch (error) {
+    console.log("error fetching the connections of the logged-in user", error);
+    res.status(500).json({
+      message: "Failed to fetch the connections of the logged-in user!",
     });
   }
 };
@@ -216,5 +246,6 @@ module.exports = {
   displayRegisteredUsers,
   sendRequest,
   displayRequests,
-  acceptRequest
+  acceptRequest,
+  displayConnections,
 };
