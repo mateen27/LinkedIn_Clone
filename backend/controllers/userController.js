@@ -1,3 +1,4 @@
+const Post = require("../models/post");
 const User = require("../models/user");
 const userService = require("../services/userService");
 const crypto = require("crypto");
@@ -216,18 +217,20 @@ const displayConnections = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const user = await userService
-      .findUserById(userId)
-      // .populate("connections", "name email profileImage createdAt")
-      // .exec();
+    const user = await userService.findUserById(userId);
+    // .populate("connections", "name email profileImage createdAt")
+    // .exec();
 
     if (!user) {
       res.status(404).json({ message: "User not found!" });
     }
 
-    if ( user ) {
-      const userInfo = await user.populate("connections" , "name email profileImage createdAt")
-      res.status(200).json( userInfo.connections );
+    if (user) {
+      const userInfo = await user.populate(
+        "connections",
+        "name email profileImage createdAt"
+      );
+      res.status(200).json(userInfo.connections);
       // console.log(userInfo.connections);
     }
   } catch (error) {
@@ -235,6 +238,40 @@ const displayConnections = async (req, res) => {
     res.status(500).json({
       message: "Failed to fetch the connections of the logged-in user!",
     });
+  }
+};
+
+// for posting the post on linkedin
+const createPost = async (req, res) => {
+  try {
+    const { description, imageUrl, userId } = req;
+    const newPost = new Post({
+      description,
+      imageUrl,
+      user: userId,
+    });
+
+    //  save post to the database
+    await newPost.save();
+
+    res
+      .status(201)
+      .json({ message: "Post created successfully", post: newPost });
+  } catch (error) {
+    console.log("error creating the post", error);
+    res.status(500).json({ message: "Failed to create the post!" });
+  }
+};
+
+// endpoint for fetching all the posts
+const fetchPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().populate("user", "name profileImage");
+
+    res.status(200).json({ posts });
+  } catch (error) {
+    console.log("error fetching all the posts", error);
+    res.status(500).json({ message: "Failed to fetch all the posts!" });
   }
 };
 
@@ -248,4 +285,6 @@ module.exports = {
   displayRequests,
   acceptRequest,
   displayConnections,
+  createPost,
+  fetchPosts,
 };
