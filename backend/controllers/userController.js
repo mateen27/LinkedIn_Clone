@@ -244,7 +244,7 @@ const displayConnections = async (req, res) => {
 // for posting the post on linkedin
 const createPost = async (req, res) => {
   try {
-    const { description, imageUrl, userId } = req;
+    const { description, imageUrl, userId } = req.body;
     const newPost = new Post({
       description,
       imageUrl,

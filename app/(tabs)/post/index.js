@@ -7,15 +7,135 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import secretKey from "../../../private/secretKey";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import JWT from "expo-jwt";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { firebase } from "../../../firebase";
 
 // icons import
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const index = () => {
   // state management
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState("");
+  const [userId, setUserId] = useState("");
+
+  // router
+  const router = useRouter();
+
+  // for fetching the user-details
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
+
+  // fetch the logged-in user details
+  const fetchUserDetails = async () => {
+    try {
+      // accessing the token from AsyncStorage
+      const userID = await AsyncStorage.getItem("userID");
+      // console.log('userID' , userID);
+
+      // decoding the token [userID]
+      const decodeUserID = JWT.decode(userID, secretKey);
+      // console.log("Decoded Token:", decodeUserID);
+
+      // setting to the userID to the state
+      setUserId(decodeUserID.userID);
+    } catch (error) {
+      console.log("Error fetching userId", error);
+    }
+  };
+
+  // function to pick the images from the gallery
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  // console.log('image' , image);
+
+  // function to create the post
+  const createPost = async () => {
+    try {
+      const uploadUrl = await uploadFile();
+
+      const postData = {
+        description: description,
+        imageUrl: uploadUrl,
+        userId: userId,
+      };
+
+      const response = await axios.post(
+        "http://192.168.29.181:8080/user/create-post",
+        postData
+      );
+
+      console.log("post created", response.data);
+
+      if (response.status === 201 || response.status === 200) {
+        router.replace("/(tabs)/home");
+      }
+    } catch (error) {
+      console.log("error creating post", error);
+    }
+  };
+
+  // function to upload the file
+  const uploadFile = async () => {
+    try {
+      // Ensure that 'image' contains a valid file URI
+      console.log("Image URI:", image);
+
+      const { uri } = await FileSystem.getInfoAsync(image);
+
+      if (!uri) {
+        throw new Error("Invalid file URI");
+      }
+
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = (e) => {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", uri, true);
+        xhr.send(null);
+      });
+
+      const filename = image.substring(image.lastIndexOf("/") + 1);
+
+      const ref = firebase.storage().ref().child(filename);
+      await ref.put(blob);
+
+      const downloadURL = await ref.getDownloadURL();
+      // setUrl(downloadURL);
+      return downloadURL;
+      // Alert.alert("Photo uploaded");
+    } catch (error) {
+      console.log("Error:", error);
+      // Handle the error or display a user-friendly message
+    }
+  };
 
   return (
     <ScrollView style={styles.scrollViewContainer}>
@@ -39,7 +159,7 @@ const index = () => {
 
         <View style={[styles.itemContainer, { marginRight: 8 }]}>
           <Entypo name="back-in-time" size={24} color="black" />
-          <Pressable style={styles.pressableStyle}>
+          <Pressable onPress={createPost} style={styles.pressableStyle}>
             <Text
               style={{
                 textAlign: "center",
@@ -65,8 +185,17 @@ const index = () => {
         style={styles.textInputStyle}
       />
 
+      <View>
+        {image && (
+          <Image
+            source={{ uri: image }}
+            style={{ width: "100%", height: 240, marginVertical: 20 }}
+          />
+        )}
+      </View>
+
       <Pressable style={styles.iconContainer}>
-        <Pressable style={styles.iconStyle}>
+        <Pressable onPress={() => pickImage()} style={styles.iconStyle}>
           <MaterialIcons name="perm-media" size={24} color="black" />
         </Pressable>
         <Text>Media</Text>
@@ -120,7 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     marginTop: 10,
-    backgroundColor : '#fbfbf9'
+    backgroundColor: "#fbfbf9",
   },
   iconStyle: {
     width: 40,
