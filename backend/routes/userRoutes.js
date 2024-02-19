@@ -20,6 +20,10 @@ router.get("/connection-request/:userId", userController.displayRequests);
 router.post("/accept-request", userController.acceptRequest);
 // for retrieving all the connections of the logged in user
 router.get("/connections/:userId" , userController.displayConnections);
+// for creating the post 
+router.post('/create-post' , userController.createPost);
+// for fetching the posts
+router.get('/fetch-posts', userController.fetchPosts);
 
 
 module.exports = router;
