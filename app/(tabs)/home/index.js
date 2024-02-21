@@ -14,7 +14,7 @@ import JWT from "expo-jwt";
 import axios from "axios";
 
 // icons import
-import { Feather, FontAwesome } from "@expo/vector-icons";
+import { Feather, FontAwesome, SimpleLineIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -28,9 +28,28 @@ const index = () => {
   const [userData, setUserData] = useState("");
   const [posts, setPosts] = useState([]);
   const [showFullText, setShowFullText] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+
+  // function to show the full text of the post
   const toggleShow = () => {
     setShowFullText(!showFullText);
   };
+  // function for liking the post
+  const handleLikePost = async (postId) => {
+    try {
+      const response = await axios.post(
+        `http://192.168.29.181:8080/user/like/${postId}/${userId}`
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        const updatePost = response.data.post;
+        setIsLiked(updatePost.likes.some((like) => like.user === userId));
+      }
+    } catch (error) {
+      console.log("error liking/unliking the post", error);
+    }
+  };
+
   // for fetching the user-details
   useEffect(() => {
     fetchUserDetails();
@@ -250,6 +269,21 @@ const index = () => {
               source={{ uri: item?.imageUrl }}
             />
 
+            {/* for likes */}
+            {item?.likes?.length > 0 && (
+              <View
+                style={{
+                  padding: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <SimpleLineIcons name="like" size={16} color="#0072b1" />
+                <Text style={{ color: "grey" }}>{item?.likes?.length}</Text>
+              </View>
+            )}
+
             {/* border after image */}
             <View
               style={{ borderColor: "#e0e0e0", borderWidth: 2, height: 2 }}
@@ -264,17 +298,17 @@ const index = () => {
                 marginVertical: 10,
               }}
             >
-              <Pressable>
+              <Pressable onPress={() => handleLikePost(item?._id)}>
                 <AntDesign
                   style={{ textAlign: "center" }}
                   name="like2"
                   size={20}
-                  color="gray"
+                  color={isLiked ? '#0072b1' : 'grey'}
                 />
                 <Text
                   style={{
                     textAlign: "center",
-                    color: "grey",
+                    color: isLiked ? '#0072b1' : 'grey',
                     fontSize: 12,
                     marginTop: 2,
                   }}
