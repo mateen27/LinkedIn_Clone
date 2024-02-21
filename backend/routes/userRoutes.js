@@ -25,6 +25,8 @@ router.post("/create-post", userController.createPost);
 // for fetching the posts
 router.get("/fetch-posts", userController.fetchPosts);
 // for liking the posts
-router.post("/like/:postId/:userId" , userController.likePost);
+router.post("/like/:postId/:userId", userController.likePost);
+// for updating the user Description
+router.post("/update-description/:userId", userController.updateDescription);
 
 module.exports = router;

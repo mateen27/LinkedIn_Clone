@@ -301,10 +301,30 @@ const likePost = async (req, res) => {
 
     await post.save();
 
-    res.status(200).json({ message: "Post like/unlike successfully achieved" , post });
+    res
+      .status(200)
+      .json({ message: "Post like/unlike successfully achieved", post });
   } catch (error) {
     console.log("error liking the post", error);
     res.status(500).json({ message: "Failed to like the post!" });
+  }
+};
+
+// for updating the user Description
+const updateDescription = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { userDescription } = req.body;
+
+    // finding the user by the id of the user and updating the user description
+    await User.findByIdAndUpdate(userId, { userDescription });
+
+    res.status(200).json({ message: "User description updated successfully" });
+  } catch (error) {
+    console.log("error updating description of the user", error);
+    res
+      .status(500)
+      .json({ message: "Failed to update description of the user!" });
   }
 };
 
@@ -320,4 +340,6 @@ module.exports = {
   displayConnections,
   createPost,
   fetchPosts,
+  likePost,
+  updateDescription
 };
