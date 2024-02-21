@@ -19,11 +19,12 @@ router.get("/connection-request/:userId", userController.displayRequests);
 // for accepting the connection request of the logged in user
 router.post("/accept-request", userController.acceptRequest);
 // for retrieving all the connections of the logged in user
-router.get("/connections/:userId" , userController.displayConnections);
-// for creating the post 
-router.post('/create-post' , userController.createPost);
+router.get("/connections/:userId", userController.displayConnections);
+// for creating the post
+router.post("/create-post", userController.createPost);
 // for fetching the posts
-router.get('/fetch-posts', userController.fetchPosts);
-
+router.get("/fetch-posts", userController.fetchPosts);
+// for liking the posts
+router.post("/like/:postId/:userId" , userController.likePost);
 
 module.exports = router;

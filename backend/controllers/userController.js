@@ -275,6 +275,39 @@ const fetchPosts = async (req, res) => {
   }
 };
 
+// for liking the posts
+const likePost = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const userId = req.params.userId;
+
+    // finding the post by the id of the post
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      res.status(400).json({ message: "Post not found!" });
+    }
+
+    // cheking if the user has alread liked th post
+    const existingLike = post?.likes.find(
+      (like) => like.user.toString() === userId
+    );
+
+    if (existingLike) {
+      post.likes = post.likes.filter((like) => like.user.toString() !== userId);
+    } else {
+      post.likes.push({ user: userId });
+    }
+
+    await post.save();
+
+    res.status(200).json({ message: "Post like/unlike successfully achieved" , post });
+  } catch (error) {
+    console.log("error liking the post", error);
+    res.status(500).json({ message: "Failed to like the post!" });
+  }
+};
+
 module.exports = {
   registerUser,
   verifyUser,
