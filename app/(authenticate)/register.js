@@ -17,6 +17,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 // expo router
 import { useRouter } from "expo-router";
 import axios from "axios";
+import * as ImagePicker from 'expo-image-picker'
 
 const register = () => {
   // state management
@@ -28,13 +29,75 @@ const register = () => {
   //   router
   const router = useRouter();
 
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      // console.log();
+
+      if (!result.cancelled) {
+        setImage(result.assets[0].uri);
+      } else {
+        Alert.alert("You canceled the image selection.");
+      }
+    } catch (error) {
+      console.error("Error picking image: ", error);
+    }
+  };
+
+  // function for uploading Image to The Cloudinary Service
+  const uploadImageToCloudinary = async () => {
+    if (image) {
+      const data = new FormData();
+      data.append("file", {
+        uri: image,
+        type: `image/${image.split(".").pop()}`,
+        name: `test.${image.split(".").pop()}`,
+      });
+      data.append("upload_preset", "ShowStarter");
+
+      try {
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/dvvnup3nh/image/upload",
+          {
+            method: "post",
+            body: data,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          const cloudinaryData = await response.json();
+          if (cloudinaryData.secure_url) {
+            console.log("Image uploaded to Cloudinary: ", cloudinaryData.secure_url);
+            return cloudinaryData.secure_url;
+          }
+        }
+        console.log("Image upload to Cloudinary failed");
+      } catch (error) {
+        console.error("Error uploading to Cloudinary: ", error);
+      }
+    } else {
+      Alert.alert("Please select an image before uploading.");
+    }
+  };
+
   //   function for registering the user
   const handleRegister = async () => {
+
+    const cloudinaryUrl = await uploadImageToCloudinary();
     const user = {
       name,
       email,
       password,
-      profileImage: image,
+      profileImage: cloudinaryUrl,
     };
 
     axios
@@ -134,7 +197,7 @@ const register = () => {
             />
             <TouchableOpacity
               style={[styles.uploadButtonStyle, { width: 200 }]} // Adjust the width here
-              onPress={() => console.log("Image Upload Button pressed")}
+              onPress={() => pickImage()}
             >
               <Text style={styles.uploadButtonTextStyle}>Upload an Image</Text>
             </TouchableOpacity>
