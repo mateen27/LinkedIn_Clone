@@ -176,7 +176,14 @@ const index = () => {
         <Ionicons name="chatbox-ellipses-outline" size={24} color="black" />
       </View>
 
-      <View style={{ borderColor: "#e0e0e0", borderWidth : 2 ,  height : 2 , marginBottom : 10  }} />
+      <View
+        style={{
+          borderColor: "#e0e0e0",
+          borderWidth: 2,
+          height: 2,
+          marginBottom: 10,
+        }}
+      />
 
       {/* View for the posts */}
       <View>
@@ -232,7 +239,7 @@ const index = () => {
               </Text>
               {!showFullText && (
                 <Pressable onPress={toggleShow}>
-                  <Text>See More...</Text>
+                  <Text style={{ color: "grey" }}>See More...</Text>
                 </Pressable>
               )}
             </View>
@@ -244,7 +251,9 @@ const index = () => {
             />
 
             {/* border after image */}
-            <View style={{ borderColor: "#e0e0e0", borderWidth : 2 ,  height : 2  }} />
+            <View
+              style={{ borderColor: "#e0e0e0", borderWidth: 2, height: 2 }}
+            />
 
             {/* for the like comment icons */}
             <View
@@ -274,7 +283,7 @@ const index = () => {
                 </Text>
               </Pressable>
               <Pressable>
-              <FontAwesome
+                <FontAwesome
                   name="comment-o"
                   size={20}
                   color="gray"
@@ -292,7 +301,12 @@ const index = () => {
                 </Text>
               </Pressable>
               <Pressable>
-              <Feather style = {{ textAlign : 'center' }} name="share" size={20} color="grey" />
+                <Feather
+                  style={{ textAlign: "center" }}
+                  name="share"
+                  size={20}
+                  color="grey"
+                />
                 <Text
                   style={{
                     marginTop: 2,
@@ -305,14 +319,21 @@ const index = () => {
                 </Text>
               </Pressable>
               <Pressable>
-              <Feather style = {{ textAlign : 'center' }} name="send" size={20} color="gray" />
+                <Feather
+                  style={{ textAlign: "center" }}
+                  name="send"
+                  size={20}
+                  color="gray"
+                />
                 <Text style={{ marginTop: 2, fontSize: 12, color: "gray" }}>
                   Send
                 </Text>
               </Pressable>
             </View>
 
-            <View style={{ borderColor: "#e0e0e0", borderWidth : 2 ,  height : 2  }} />
+            <View
+              style={{ borderColor: "#e0e0e0", borderWidth: 2, height: 2 }}
+            />
           </View>
         ))}
       </View>
