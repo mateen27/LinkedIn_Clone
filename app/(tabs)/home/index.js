@@ -19,8 +19,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const index = () => {
+  // router
+  const router = useRouter();
   // variables
   const MAX_LINES = 2;
   // state management
@@ -164,7 +167,7 @@ const index = () => {
           gap: 4,
         }}
       >
-        <Pressable>
+        <Pressable onPress={() => router.push("/home/profile")}>
           <Image
             style={styles.imageStyle}
             source={{ uri: userData?.profileImage }}
@@ -303,12 +306,12 @@ const index = () => {
                   style={{ textAlign: "center" }}
                   name="like2"
                   size={20}
-                  color={isLiked ? '#0072b1' : 'grey'}
+                  color={isLiked ? "#0072b1" : "grey"}
                 />
                 <Text
                   style={{
                     textAlign: "center",
-                    color: isLiked ? '#0072b1' : 'grey',
+                    color: isLiked ? "#0072b1" : "grey",
                     fontSize: 12,
                     marginTop: 2,
                   }}
